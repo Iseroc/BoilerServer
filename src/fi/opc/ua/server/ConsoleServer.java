@@ -22,7 +22,6 @@ import java.util.TreeMap;
 import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
@@ -197,7 +196,6 @@ public class ConsoleServer {
 	 * Number of nodes to create for the Big Node Manager. This can be modified
 	 * from the command line.
 	 */
-	private static int bigAddressSpaceNodes = 1000;
 	private static Logger logger = Logger.getLogger(ConsoleServer.class);
 	private static boolean stackTraceOnException = false;
 	protected static String APP_NAME = "BoilerServer";
@@ -235,7 +233,7 @@ public class ConsoleServer {
 		ConsoleServer sampleConsoleServer = new ConsoleServer();
 
 		// Initialize the server
-		sampleConsoleServer.initialize(52520, 52443, APP_NAME);
+		sampleConsoleServer.initialize(52510, 52443, APP_NAME);
 
 		// Create the address space
 		sampleConsoleServer.createAddressSpace();
@@ -332,8 +330,6 @@ public class ConsoleServer {
 				&& ((args[i].startsWith("-") || args[i].startsWith("/")))) {
 			if (args[i].equals("-t"))
 				stackTraceOnException = true;
-			else if (args[i].equals("-b"))
-				bigAddressSpaceNodes = Integer.parseInt(args[++i]);
 			else if (args[i].equals("-k"))
 				CertificateUtils.setKeySize(Integer.parseInt(args[++i]));
 			else if (args[i].equals("-d"))
@@ -354,7 +350,6 @@ public class ConsoleServer {
 	 */
 	protected static void usage() {
 		println("Usage: " + APP_NAME + " [-b] [-t] [serverUri]");
-		println("   -b n       Define number of nodes to create in the BigNodeManager (default=1000)");
 		println("   -k keySize Define the size of the public key of the application certificate (default 1024; other valid values 2048, 4096)");
 		println("   -d url     Define the DiscoveryServerUrl to register the application to");
 		println("   -d-        Define that the application should not be registered to a DiscoveryServer");
@@ -379,18 +374,6 @@ public class ConsoleServer {
 	private FolderType dataItemFolder;
 	private FolderType deepFolder;
 	private FileNodeManager fileNodeManager;
-	private MyBigNodeManager myBigNodeManager;
-	private final Runnable simulationTask = new Runnable() {
-
-		@Override
-		public void run() {
-			if (server.isRunning()) {
-				logger.debug("Simulating");
-				simulate();
-			}
-		}
-	};
-	private final ScheduledExecutorService simulator = Executors.newScheduledThreadPool(10);
 	private FolderType staticArrayVariableFolder;
 	private FolderType staticVariableFolder;
 	protected int complianceNamespaceIndex;
@@ -478,17 +461,6 @@ public class ConsoleServer {
 	}
 
 	/**
-	 * Create a sample node manager, which does not use UaNode objects. These
-	 * are suitable for managing big address spaces for data that is in practice
-	 * available from another existing subsystem.
-	 */
-	private void createBigNodeManager() {
-		myBigNodeManager = new MyBigNodeManager(server,
-				"http://www.prosysopc.com/OPCUA/SampleBigAddressSpace",
-				bigAddressSpaceNodes);
-	}
-
-	/**
 	 * @throws NodeBuilderException
 	 *
 	 */
@@ -502,34 +474,23 @@ public class ConsoleServer {
 					.getNamespaceIndex();
 
 			// UA types and folders which we will use
-			final UaObject objectsFolder = server.getNodeManagerRoot()
-					.getObjectsFolder();
+			final UaObject objectsFolder = server.getNodeManagerRoot().getObjectsFolder();
 
-			final NodeId staticDataFolderId = new NodeId(
-					complianceNamespaceIndex, "StaticData");
-			FolderType staticDataFolder = complianceNodeManager.createInstance(
-					FolderType.class, "StaticData", staticDataFolderId);
+			final NodeId staticDataFolderId = new NodeId(complianceNamespaceIndex, "StaticData");
+			FolderType staticDataFolder = complianceNodeManager.createInstance(FolderType.class, "StaticData", staticDataFolderId);
 
-			objectsFolder.addReference(staticDataFolder, Identifiers.Organizes,
-					false);
+			objectsFolder.addReference(staticDataFolder, Identifiers.Organizes, false);
 
 			// Folder for static test variables
-			final NodeId staticVariableFolderId = new NodeId(
-					complianceNamespaceIndex, "StaticVariablesFolder");
-			staticVariableFolder = complianceNodeManager.createInstance(
-					FolderTypeNode.class, "StaticVariables",
-					staticVariableFolderId);
+			final NodeId staticVariableFolderId = new NodeId(complianceNamespaceIndex, "StaticVariablesFolder");
+			staticVariableFolder = complianceNodeManager.createInstance(FolderTypeNode.class, "StaticVariables", staticVariableFolderId);
 
-			complianceNodeManager.addNodeAndReference(staticDataFolder,
-					staticVariableFolder, Identifiers.Organizes);
+			complianceNodeManager.addNodeAndReference(staticDataFolder,staticVariableFolder, Identifiers.Organizes);
 
 			createStaticVariable("Boolean", Identifiers.Boolean, true);
-			createStaticVariable("Byte", Identifiers.Byte,
-					UnsignedByte.valueOf(0));
-			createStaticVariable("ByteString", Identifiers.ByteString,
-					new byte[] { (byte) 0 });
-			createStaticVariable("DateTime", Identifiers.DateTime,
-					DateTime.currentTime());
+			createStaticVariable("Byte", Identifiers.Byte, UnsignedByte.valueOf(0));
+			createStaticVariable("ByteString", Identifiers.ByteString, new byte[] { (byte) 0 });
+			createStaticVariable("DateTime", Identifiers.DateTime, DateTime.currentTime());
 			createStaticVariable("Double", Identifiers.Double, (double) 0);
 			createStaticVariable("Float", Identifiers.Float, (float) 0);
 			createStaticVariable("GUID", Identifiers.Guid, UUID.randomUUID());
@@ -538,27 +499,18 @@ public class ConsoleServer {
 			createStaticVariable("Int64", Identifiers.Int64, (long) 0);
 			createStaticVariable("SByte", Identifiers.SByte, (byte) 0);
 			createStaticVariable("String", Identifiers.String, "testString");
-			createStaticVariable("UInt16", Identifiers.UInt16,
-					UnsignedShort.valueOf(0));
-			createStaticVariable("UInt32", Identifiers.UInt32,
-					UnsignedInteger.valueOf(0));
-			createStaticVariable("UInt64", Identifiers.UInt64,
-					UnsignedLong.valueOf(0));
-			createStaticVariable("XmlElement", Identifiers.XmlElement,
-					new XmlElement("<testElement />"));
+			createStaticVariable("UInt16", Identifiers.UInt16, UnsignedShort.valueOf(0));
+			createStaticVariable("UInt32", Identifiers.UInt32, UnsignedInteger.valueOf(0));
+			createStaticVariable("UInt64", Identifiers.UInt64, UnsignedLong.valueOf(0));
+			createStaticVariable("XmlElement", Identifiers.XmlElement, new XmlElement("<testElement />"));
 
 			// Folder for static test array variables
-			final NodeId staticArrayVariableFolderId = new NodeId(
-					complianceNamespaceIndex, "StaticArrayVariablesFolder");
-			staticArrayVariableFolder = complianceNodeManager.createInstance(
-					FolderTypeNode.class, "StaticArrayVariables",
-					staticArrayVariableFolderId);
+			final NodeId staticArrayVariableFolderId = new NodeId(complianceNamespaceIndex, "StaticArrayVariablesFolder");
+			staticArrayVariableFolder = complianceNodeManager.createInstance(FolderTypeNode.class, "StaticArrayVariables", staticArrayVariableFolderId);
 
-			staticDataFolder.addReference(staticArrayVariableFolder,
-					Identifiers.Organizes, false);
+			staticDataFolder.addReference(staticArrayVariableFolder, Identifiers.Organizes, false);
 
-			createStaticArrayVariable("BooleanArray", Identifiers.Boolean,
-					new Boolean[] { true, false, true, false, false });
+			createStaticArrayVariable("BooleanArray", Identifiers.Boolean, new Boolean[] { true, false, true, false, false });
 			createStaticArrayVariable(
 					"ByteArray",
 					Identifiers.Byte,
@@ -827,10 +779,6 @@ public class ConsoleServer {
 		// My HistoryManager
 		myNodeManager.getHistoryManager().setListener(myHistorian);
 
-		// A sample node manager that can handle a big amount of UA nodes
-		// without creating UaNode objects in memory
-		createBigNodeManager();
-
 		// More specific nodes to enable OPC UA compliance testing of more
 		// advanced features
 		createComplianceNodes();
@@ -866,14 +814,11 @@ public class ConsoleServer {
 
 		// Fetch version information from the package manifest
 		final Package sdkPackage = UaServer.class.getPackage();
-		final String implementationVersion = sdkPackage
-				.getImplementationVersion();
+		final String implementationVersion = sdkPackage.getImplementationVersion();
 		if (implementationVersion != null) {
 			int splitIndex = implementationVersion.lastIndexOf(".");
-			final String softwareVersion = implementationVersion.substring(0,
-					splitIndex);
-			String buildNumber = implementationVersion
-					.substring(splitIndex + 1);
+			final String softwareVersion = implementationVersion.substring(0, splitIndex);
+			String buildNumber = implementationVersion.substring(splitIndex + 1);
 
 			buildInfo.setManufacturerName(sdkPackage.getImplementationVendor());
 			buildInfo.setSoftwareVersion(softwareVersion);
@@ -881,8 +826,7 @@ public class ConsoleServer {
 
 		}
 
-		final URL classFile = UaServer.class
-				.getResource("/com/prosysopc/ua/samples/server/SampleConsoleServer.class");
+		final URL classFile = UaServer.class.getResource("/com/prosysopc/ua/samples/server/SampleConsoleServer.class");
 		if (classFile != null) {
 			final File mfFile = new File(classFile.getFile());
 			GregorianCalendar c = new GregorianCalendar();
@@ -1120,38 +1064,13 @@ public class ConsoleServer {
 		if (enableSessionDiagnostics)
 			server.getNodeManagerRoot().getServerData()
 					.getServerDiagnosticsNode().setEnabled(true);
-		startSimulation();
 
 		// *** Main Menu Loop
 		mainMenu();
 
-		// *** End
-		stopSimulation();
 		// Notify the clients about a shutdown, with a 5 second delay
 		println("Shutting down...");
 		server.shutdown(5, new LocalizedText("Closed by user", Locale.ENGLISH));
 		println("Closed.");
-	}
-
-	protected void simulate() {
-		myNodeManager.simulate();
-		myBigNodeManager.simulate();
-	}
-
-	/**
-	 * Starts the simulation of the level measurement.
-	 */
-	protected void startSimulation() {
-		simulator.scheduleAtFixedRate(simulationTask, 1000, 1000,
-				TimeUnit.MILLISECONDS);
-		logger.info("Simulation started.");
-	}
-
-	/**
-	 * Ends simulation.
-	 */
-	protected void stopSimulation() {
-		simulator.shutdown();
-		logger.info("Simulation stopped.");
 	}
 }
