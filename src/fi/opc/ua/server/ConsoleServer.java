@@ -64,6 +64,7 @@ import com.prosysopc.ua.nodes.UaNode;
 import com.prosysopc.ua.nodes.UaObject;
 import com.prosysopc.ua.nodes.UaProperty;
 import com.prosysopc.ua.nodes.UaType;
+import com.prosysopc.ua.nodes.UaVariable;
 import com.prosysopc.ua.server.FileNodeManager;
 import com.prosysopc.ua.server.NodeBuilderConfiguration;
 import com.prosysopc.ua.server.NodeBuilderException;
@@ -1065,6 +1066,9 @@ public class ConsoleServer {
 			server.getNodeManagerRoot().getServerData()
 					.getServerDiagnosticsNode().setEnabled(true);
 
+		//start simulation
+		thread.start();
+		
 		// *** Main Menu Loop
 		mainMenu();
 
@@ -1073,4 +1077,33 @@ public class ConsoleServer {
 		server.shutdown(5, new LocalizedText("Closed by user", Locale.ENGLISH));
 		println("Closed.");
 	}
+	
+	//Simulation thread
+	Thread thread = new Thread(){
+	    public void run(){
+	    	System.out.println("Thread Running");
+	    	
+	    	UaVariable testNode = null;
+			try {
+				testNode = (UaVariable)(server.getAddressSpace().getNode(new NodeId(2, "TESTNODE")));
+			} catch (StatusException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			
+	    	while(true) {
+	    		try {
+					sleep(5000);
+					if(testNode != null) {
+						testNode.setValue(testNode.getValue().getValue().doubleValue() + 1);
+					}
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				} catch (StatusException e) {
+					e.printStackTrace();
+				}
+	    	}
+	    }
+	};
+
 }

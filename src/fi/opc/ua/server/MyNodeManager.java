@@ -147,78 +147,80 @@ public class MyNodeManager extends NodeManagerUaNode {
 		this.addNodeAndReference(baseObjectType, myDeviceType,
 				Identifiers.HasSubtype);
 
-		createBoilerAddressSpace(ns, baseObjectType);
+//		createBoilerAddressSpace(ns, baseObjectType, 1);
+		createMultiBoilerAddressSpace(ns, baseObjectType);
+//		createTransformedBoilerAddressSpace(ns, baseObjectType);
 	}
 
-	private void createBoilerAddressSpace(int ns, UaType baseObjectType) throws StatusException
+	private void createBoilerAddressSpace(int ns, UaType baseObjectType, int number) throws StatusException
 	{
 		//Boiler
 		UaObjectType boilerType = createType(ns, "BoilerType", baseObjectType);
-		UaObjectNode boiler = createNode(ns, "Boiler", boilerType, myObjectsFolder);
+		UaObjectNode boiler = createNode(ns, "Boiler" + number, boilerType, myObjectsFolder);
 		
 		//Pipe1001
 		UaObjectType pipeType = createType(ns, "PipeType", baseObjectType);
-		UaObjectNode pipe1 = createNode(ns, "Pipe1001", pipeType, boiler);
+		UaObjectNode pipe1 = createNode(ns, "Pipe" + number + "001", pipeType, boiler);
 
 		//FT1001
 		UaObjectType ftType = createType(ns, "FTType", baseObjectType);
-		UaObjectNode ft1 = createNode(ns, "FT1001", ftType, pipe1);
+		UaObjectNode ft1 = createNode(ns, "FT" + number + "001", ftType, pipe1);
 
 		//FT1001/DataItem
-		PlainVariable<Double> ft1data = createVariable(ns, "DataItem", (double)1.0, ft1);
+		PlainVariable<Double> ft1data = createVariable(ns, "DataItem", (double)1.0, Identifiers.Double, ft1);
 		
 		//Valve1001
 		UaObjectType valveType = createType(ns, "ValveType", baseObjectType);
-		UaObjectNode valve1 = createNode(ns, "Valve1001", valveType, pipe1);
+		UaObjectNode valve1 = createNode(ns, "Valve" + number + "001", valveType, pipe1);
 
 		//Valve1001/DataItem
-		PlainVariable<Double> valve1data = createVariable(ns, "DataItem", (double)2.0, valve1);
+		PlainVariable<Double> valve1data = createVariable(ns, "DataItem", (double)2.0, Identifiers.Double, valve1);
 		
 		//Drum1001
 		UaObjectType drumType = createType(ns, "DrumType", baseObjectType);
-		UaObjectNode drum1 = createNode(ns, "Drum1001", drumType, boiler);
+		UaObjectNode drum1 = createNode(ns, "Drum" + number + "001", drumType, boiler);
 
 		//LI1001
 		UaObjectType liType = createType(ns, "LIType", baseObjectType);
-		UaObjectNode li1 = createNode(ns, "LI1001", liType, drum1);
+		UaObjectNode li1 = createNode(ns, "LI" + number + "001", liType, drum1);
 
 		//LI1001/DataItem
-		PlainVariable<Double> li1data = createVariable(ns, "DataItem", (double)3.0, li1);
+		PlainVariable<Double> li1data = createVariable(ns, "DataItem", (double)3.0, Identifiers.Double, li1);
 
 		//Pipe1001
-		UaObjectNode pipe2 = createNode(ns, "Pipe1002", pipeType, boiler);
+		UaObjectNode pipe2 = createNode(ns, "Pipe" + number + "002", pipeType, boiler);
 
 		//FT1001
-		UaObjectNode ft2 = createNode(ns, "FT1002", ftType, pipe2);
+		UaObjectNode ft2 = createNode(ns, "FT" + number + "002", ftType, pipe2);
 
 		//FT1001/DataItem
-		PlainVariable<Double> ft2data = createVariable(ns, "DataItem", (double)4.0, ft2);
+		PlainVariable<Double> ft2data = createVariable(ns, "DataItem", (double)4.0, Identifiers.Double, ft2);
 		
 		//FC1001
 		UaObjectType controllerType = createType(ns, "ControllerType", baseObjectType);
-		UaObjectNode fc1 = createNode(ns, "FC1001", controllerType, boiler);
+		UaObjectNode fc1 = createNode(ns, "FC" + number + "001", controllerType, boiler);
 
 		//FT1001/variables
-		PlainVariable<Double> fc1meas = createVariable(ns, "Measurement", (double)5.1, fc1);
-		PlainVariable<Double> fc1out = createVariable(ns, "ControlOut", (double)5.2, fc1);
-		PlainVariable<Double> fc1set = createVariable(ns, "SetPoint", (double)5.3, fc1);
+		PlainVariable<Double> fc1meas = createVariable(ns, "Measurement", (double)5.1, Identifiers.Double, fc1);
+		PlainVariable<Double> fc1out = createVariable(ns, "ControlOut", (double)5.2, Identifiers.Double, fc1);
+		PlainVariable<Double> fc1set = createVariable(ns, "SetPoint", (double)5.3, Identifiers.Double, fc1);
 
 		//LC1001
-		UaObjectNode lc1 = createNode(ns, "LC1001", controllerType, boiler);
+		UaObjectNode lc1 = createNode(ns, "LC" + number + "001", controllerType, boiler);
 
 		//FT1001/variables
-		PlainVariable<Double> lc1meas = createVariable(ns, "Measurement", (double)6.1, lc1);
-		PlainVariable<Double> lc1out = createVariable(ns, "ControlOut", (double)6.2, lc1);
-		/*PlainVariable<Double> lc1set = */createVariable(ns, "SetPoint", (double)6.3, lc1);
+		PlainVariable<Double> lc1meas = createVariable(ns, "Measurement", (double)6.1, Identifiers.Double, lc1);
+		PlainVariable<Double> lc1out = createVariable(ns, "ControlOut", (double)6.2, Identifiers.Double, lc1);
+		/*PlainVariable<Double> lc1set = */createVariable(ns, "SetPoint", (double)6.3, Identifiers.Double, lc1);
 
 		//LC1001
-		UaObjectNode cc1 = createNode(ns, "CC1001", controllerType, boiler);
+		UaObjectNode cc1 = createNode(ns, "CC" + number + "001", controllerType, boiler);
 
 		//FT1001/variables
-		PlainVariable<Double> cc1in1 = createVariable(ns, "Input1", (double)7.1, cc1);
-		PlainVariable<Double> cc1in2 = createVariable(ns, "Input2", (double)7.2, cc1);
-		PlainVariable<Double> cc1in3 = createVariable(ns, "Input3", (double)7.3, cc1);
-		PlainVariable<Double> cc1out = createVariable(ns, "ControlOut", (double)7.3, cc1);
+		PlainVariable<Double> cc1in1 = createVariable(ns, "Input1", (double)7.1, Identifiers.Double, cc1);
+		PlainVariable<Double> cc1in2 = createVariable(ns, "Input2", (double)7.2, Identifiers.Double, cc1);
+		PlainVariable<Double> cc1in3 = createVariable(ns, "Input3", (double)7.3, Identifiers.Double, cc1);
+		PlainVariable<Double> cc1out = createVariable(ns, "ControlOut", (double)7.3, Identifiers.Double, cc1);
 		
 		
 		//**** OLD NODES ****//
@@ -233,6 +235,100 @@ public class MyNodeManager extends NodeManagerUaNode {
 		ft2data.addReference(cc1in3, Identifiers.HasEffect, false);
 		
 		fc1out.addReference(valve1data, Identifiers.HasEffect, false);
+		lc1out.addReference(cc1in1, Identifiers.HasEffect, false);
+		cc1out.addReference(fc1set, Identifiers.HasEffect, false);
+	}
+	
+	private void createMultiBoilerAddressSpace(int ns, UaType baseObjectType) throws StatusException {
+		for(int i=1; i < 4; i++) {
+			createBoilerAddressSpace(ns, baseObjectType, i);
+		}
+		
+	}
+	
+	private void createTransformedBoilerAddressSpace(int ns, UaType baseObjectType) throws StatusException
+	{
+		//Boiler
+		UaObjectType boilerType = createType(ns, "BoilerType", baseObjectType);
+		UaObjectNode boiler = createNode(ns, "Boiler", boilerType, myObjectsFolder);
+		
+		//Pipe1001
+//		UaObjectType pipeType = createType(ns, "PipeType", baseObjectType);
+//		UaObjectNode pipe1 = createNode(ns, "Pipe1001", pipeType, boiler);
+
+		//FT1001
+//		UaObjectType ftType = createType(ns, "FTType", baseObjectType);
+//		UaObjectNode ft1 = createNode(ns, "FT1001", ftType, pipe1);
+
+		//FT1001/DataItem
+		PlainVariable<Double> ft1data = createVariable(ns, "FT1001", (double)1.0, Identifiers.Double, boiler);
+		
+		//Valve1001
+//		UaObjectType valveType = createType(ns, "ValveType", baseObjectType);
+//		UaObjectNode valve1 = createNode(ns, "Valve1001", valveType, pipe1);
+
+		//Valve1001/DataItem
+//		PlainVariable<Double> valve1data = createVariable(ns, "DataItem", (double)2.0, Identifiers.Double, valve1);
+		
+		//Drum1001
+//		UaObjectType drumType = createType(ns, "DrumType", baseObjectType);
+//		UaObjectNode drum1 = createNode(ns, "Drum1001", drumType, boiler);
+
+		//LI1001
+//		UaObjectType liType = createType(ns, "LIType", baseObjectType);
+//		UaObjectNode li1 = createNode(ns, "LI1001", liType, drum1);
+
+		//LI1001/DataItem
+		PlainVariable<Double> li1data = createVariable(ns, "LI1001", (double)3.0, Identifiers.Double, boiler);
+
+		//Pipe1001
+//		UaObjectNode pipe2 = createNode(ns, "Pipe1002", pipeType, boiler);
+
+		//FT1001
+//		UaObjectNode ft2 = createNode(ns, "FT1002", ftType, pipe2);
+
+		//FT1001/DataItem
+		PlainVariable<Double> ft2data = createVariable(ns, "FT1002", (double)4.0, Identifiers.Double, boiler);
+		
+		//FC1001
+		UaObjectType controllerType = createType(ns, "ControllerType", baseObjectType);
+		UaObjectNode fc1 = createNode(ns, "FC1001", controllerType, boiler);
+
+		//FT1001/variables
+		PlainVariable<Double> fc1meas = createVariable(ns, "Measurement", (double)5.1, Identifiers.Double, fc1);
+		PlainVariable<Double> fc1out = createVariable(ns, "ControlOut", (double)5.2, Identifiers.Double, fc1);
+		PlainVariable<Double> fc1set = createVariable(ns, "SetPoint", (double)5.3, Identifiers.Double, fc1);
+
+		//LC1001
+		UaObjectNode lc1 = createNode(ns, "LC1001", controllerType, boiler);
+
+		//FT1001/variables
+		PlainVariable<Double> lc1meas = createVariable(ns, "Measurement", (double)6.1, Identifiers.Double, lc1);
+		PlainVariable<Double> lc1out = createVariable(ns, "ControlOut", (double)6.2, Identifiers.Double, lc1);
+		/*PlainVariable<Double> lc1set = */createVariable(ns, "SetPoint", (double)6.3, Identifiers.Double, lc1);
+
+		//LC1001
+		UaObjectNode cc1 = createNode(ns, "CC1001", controllerType, boiler);
+
+		//FT1001/variables
+		PlainVariable<Double> cc1in1 = createVariable(ns, "Input1", (double)7.1, Identifiers.Double, cc1);
+		PlainVariable<Double> cc1in2 = createVariable(ns, "Input2", (double)7.2, Identifiers.Double, cc1);
+		PlainVariable<Double> cc1in3 = createVariable(ns, "Input3", (double)7.3, Identifiers.Double, cc1);
+		PlainVariable<Double> cc1out = createVariable(ns, "ControlOut", (double)7.3, Identifiers.Double, cc1);
+		
+		
+		//**** OLD NODES ****//
+		
+		//TODO: CUSTOM REFERENCE TYPES
+		ft1data.addReference(li1data, Identifiers.HasEffect, false);
+		li1data.addReference(ft2data, Identifiers.HasEffect, false);
+		
+		ft1data.addReference(fc1meas, Identifiers.HasEffect, false);
+		ft1data.addReference(cc1in2, Identifiers.HasEffect, false);
+		li1data.addReference(lc1meas, Identifiers.HasEffect, false);
+		ft2data.addReference(cc1in3, Identifiers.HasEffect, false);
+		
+//		fc1out.addReference(valve1data, Identifiers.HasEffect, false);
 		lc1out.addReference(cc1in1, Identifiers.HasEffect, false);
 		cc1out.addReference(fc1set, Identifiers.HasEffect, false);
 	}
@@ -256,15 +352,18 @@ public class MyNodeManager extends NodeManagerUaNode {
 		return node;
 	}
 	
-	private <T> PlainVariable<T> createVariable(int ns, String name, T value, UaObjectNode parent)
+	private static boolean TESTNODE = false;
+	private <T> PlainVariable<T> createVariable(int ns, String name, T value, NodeId dataTypeId, UaObjectNode parent)
 	{
 		NodeId id = new NodeId(ns, name + UUID.randomUUID());
+		if(!TESTNODE && dataTypeId == Identifiers.Double) {
+			TESTNODE = true;
+			id = new NodeId(ns, "TESTNODE");
+		}
+
 		PlainVariable<T> variable = new PlainVariable<T>(this, id, name, LocalizedText.NO_LOCALE);
 		
-		if(value.getClass() == double.class)
-			variable.setDataTypeId(Identifiers.Double);
-		else
-			variable.setDataTypeId(Identifiers.Boolean);
+		variable.setDataTypeId(dataTypeId);
 		
 		variable.setTypeDefinitionId(Identifiers.BaseDataVariableType);
 		parent.addComponent(variable);
